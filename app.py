@@ -13,9 +13,16 @@ import os
 import json
 from google.oauth2 import service_account
 
-credentials_info = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
-client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+# Carregar as credenciais do secrets
+try:
+    credentials_info = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+except KeyError:
+    raise KeyError("A variável de ambiente GOOGLE_APPLICATION_CREDENTIALS não foi configurada.")
+except json.JSONDecodeError:
+    raise ValueError("O conteúdo da variável GOOGLE_APPLICATION_CREDENTIALS não é um JSON válido.")
+
 
 # Tabelas e colunas relevantes
 project_id = credentials.project_id
