@@ -4,27 +4,26 @@ import pandas as pd
 import plotly.express as px
 from google.cloud import bigquery
 from google.oauth2 import service_account
-import requests  # Para buscar o arquivo do GitHub
-import db_dtypes  # Certificar que o db-dtypes está instalado
+import requests
+import db_dtypes
 
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
 # URL do arquivo JSON de credenciais no GitHub
-GITHUB_CREDENTIALS_URL = "https://raw.githubusercontent.com/seu-usuario/seu-repositorio/main/caminho/credentials.json"
-
+GITHUB_CREDENTIALS_URL = "https://raw.githubusercontent.com/CidClayQuirino/AppProjecaoMinorComponent/main/credentials.json"
 
 # Função para carregar as credenciais do GitHub
 def load_credentials_from_github(url):
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Gera um erro se a resposta não for bem-sucedida
+        response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Erro ao carregar as credenciais do GitHub: {e}")
         raise e
 
-# Carregar as credenciais do arquivo hospedado no GitHub
+# Carregar credenciais
 try:
     credentials_info = load_credentials_from_github(GITHUB_CREDENTIALS_URL)
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
