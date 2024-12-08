@@ -11,7 +11,8 @@ import db_dtypes  # Certificar que o db-dtypes está instalado
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
 # URL do arquivo JSON de credenciais no GitHub
-GITHUB_CREDENTIALS_URL = "https://raw.githubusercontent.com/<seu-usuario>/<seu-repositorio>/main/credentials.json"
+GITHUB_CREDENTIALS_URL = "https://raw.githubusercontent.com/seu-usuario/seu-repositorio/main/caminho/credentials.json"
+
 
 # Função para carregar as credenciais do GitHub
 def load_credentials_from_github(url):
