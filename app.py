@@ -5,26 +5,22 @@ import pandas as pd
 import plotly.express as px
 from google.oauth2 import service_account
 from google.cloud import bigquery
-import requests
-import json
+import os
 
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
-# URL do arquivo JSON no GitHub
-CREDENTIALS_URL = "https://raw.githubusercontent.com/CidClayQuirino/AppProjecaoMinorComponent/main/credentials.json"
+# Caminho para o arquivo de credenciais
+CREDENTIALS_PATH = r"D:\Revisão Final TCC USP\credentials.json"
 
-# Carregar credenciais do GitHub
+# Carregar credenciais do arquivo local
 try:
-    response = requests.get(CREDENTIALS_URL)
-    response.raise_for_status()  # Verificar se a URL está acessível
-    credentials_info = response.json()
-    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    credentials = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH)
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-except requests.exceptions.RequestException as e:
-    st.error(f"Erro ao carregar as credenciais do GitHub: {e}")
+except FileNotFoundError:
+    st.error(f"Erro: O arquivo de credenciais não foi encontrado em {CREDENTIALS_PATH}. Verifique o caminho.")
     st.stop()
-except json.JSONDecodeError as e:
+except Exception as e:
     st.error(f"Erro ao configurar as credenciais: {e}")
     st.stop()
 
@@ -136,5 +132,6 @@ if not df_main.empty and not df_model.empty:
         st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
+
 
 
