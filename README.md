@@ -1,0 +1,2 @@
+# AppProjecaoMinorComponent
+AppProjecaoMinorComponent
