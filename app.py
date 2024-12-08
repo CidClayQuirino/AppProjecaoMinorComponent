@@ -1,22 +1,34 @@
-#app.py
+# app.py
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+from google.oauth2 import service_account
+from google.cloud import bigquery
 import requests
 import json
-from google.oauth2 import service_account
+
+# Configuração do Streamlit
+st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
 # URL do arquivo JSON no GitHub
 CREDENTIALS_URL = "https://raw.githubusercontent.com/CidClayQuirino/AppProjecaoMinorComponent/main/credentials.json"
 
+# Carregar credenciais do GitHub
 try:
     response = requests.get(CREDENTIALS_URL)
     response.raise_for_status()  # Verificar se a URL está acessível
     credentials_info = response.json()
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 except requests.exceptions.RequestException as e:
-    raise RuntimeError(f"Erro ao carregar as credenciais do GitHub: {e}")
+    st.error(f"Erro ao carregar as credenciais do GitHub: {e}")
+    st.stop()
 except json.JSONDecodeError as e:
-    raise ValueError(f"Erro ao configurar as credenciais: {e}")
+    st.error(f"Erro ao configurar as credenciais: {e}")
+    st.stop()
 
-# Tabelas e colunas relevantes
+# Configuração das tabelas e colunas relevantes
 project_id = credentials.project_id
 dataset_id = "df_dynamox"
 main_table = f"{project_id}.{dataset_id}.df_dynapredict_main_avg"
@@ -42,7 +54,6 @@ spot_ids = [
     "EM3401 Motor Redutor de Giro Traseiro",
     "EM3401 Redutor de Giro Frontal",
     "EM3401 Redutor Giro Traseiro",
-    "EM3401 Bomba Seccao P2",
 ]
 
 # Sidebar para seleção
@@ -125,4 +136,5 @@ if not df_main.empty and not df_model.empty:
         st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
+
 
