@@ -1,27 +1,35 @@
 #app.py
-# app.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from google.cloud import bigquery
 from google.oauth2 import service_account
-import db_dtypes  # Certifique-se de que o db-dtypes está instalado
-import os
-import json
+import requests  # Para buscar o arquivo do GitHub
+import db_dtypes  # Certificar que o db-dtypes está instalado
 
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
-# Carregar credenciais do secrets no Streamlit Cloud
+# URL do arquivo JSON de credenciais no GitHub
+GITHUB_CREDENTIALS_URL = "https://raw.githubusercontent.com/<seu-usuario>/<seu-repositorio>/main/credentials.json"
+
+# Função para carregar as credenciais do GitHub
+def load_credentials_from_github(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Gera um erro se a resposta não for bem-sucedida
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erro ao carregar as credenciais do GitHub: {e}")
+        raise e
+
+# Carregar as credenciais do arquivo hospedado no GitHub
 try:
-    credentials_info = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+    credentials_info = load_credentials_from_github(GITHUB_CREDENTIALS_URL)
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-except KeyError:
-    st.error("A variável GOOGLE_APPLICATION_CREDENTIALS não foi configurada corretamente nos secrets.")
-    st.stop()
-except json.JSONDecodeError:
-    st.error("O conteúdo da variável GOOGLE_APPLICATION_CREDENTIALS não é um JSON válido.")
+except Exception as e:
+    st.error(f"Erro ao configurar as credenciais: {e}")
     st.stop()
 
 # Tabelas e colunas relevantes
@@ -61,17 +69,17 @@ selected_model = st.sidebar.selectbox(
 )
 
 # Breve descrição do modelo selecionado
-model_descriptions = {
-    "LSTM": "**LSTM (Long Short-Term Memory)** é uma rede neural recorrente projetada para lidar com sequências temporais complexas e aprender padrões de longo prazo.",
-    "GRU": "**GRU (Gated Recurrent Unit)** é uma variação simplificada da LSTM que reduz a complexidade computacional, mantendo desempenho similar para dados sequenciais.",
-    "SVR": "**SVR (Support Vector Regression)** é um método de aprendizado de máquina baseado em suporte vetorial, usado para encontrar relações precisas em dados."
-}
-st.sidebar.info(model_descriptions[selected_model])
+if selected_model == "LSTM":
+    st.sidebar.info("**LSTM (Long Short-Term Memory)** é uma rede neural recorrente projetada para lidar com sequências temporais complexas e aprender padrões de longo prazo.")
+elif selected_model == "GRU":
+    st.sidebar.info("**GRU (Gated Recurrent Unit)** é uma variação simplificada da LSTM que reduz a complexidade computacional, mantendo desempenho similar para dados sequenciais.")
+elif selected_model == "SVR":
+    st.sidebar.info("**SVR (Support Vector Regression)** é um método de aprendizado de máquina baseado em suporte vetorial, usado para encontrar relações precisas em dados.")
 
 # Mensagem ao usuário sobre a seleção
 st.write(f"Gerando gráficos para o SpotId: **{selected_item}** usando o modelo: **{selected_model}**")
 
-# Função para carregar dados
+# Consultas ao BigQuery
 @st.cache_data
 def carregar_dados(query):
     """Executa uma consulta no BigQuery e retorna um DataFrame."""
@@ -133,3 +141,4 @@ if not df_main.empty and not df_model.empty:
         st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
+
