@@ -1,11 +1,10 @@
-# app.py
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from google.oauth2 import service_account
 from google.cloud import bigquery
 import os
+import json
 
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
@@ -15,10 +14,26 @@ CREDENTIALS_PATH = r"D:\Revisão Final TCC USP\credentials.json"
 
 # Carregar credenciais do arquivo local
 try:
+    # Verifica se o arquivo de credenciais existe
+    if not os.path.exists(CREDENTIALS_PATH):
+        raise FileNotFoundError(f"O arquivo de credenciais não foi encontrado em {CREDENTIALS_PATH}.")
+
+    # Verifica se o arquivo não está vazio
+    if os.path.getsize(CREDENTIALS_PATH) == 0:
+        raise ValueError(f"O arquivo de credenciais em {CREDENTIALS_PATH} está vazio.")
+
+    # Verifica se o conteúdo do arquivo é um JSON válido
+    with open(CREDENTIALS_PATH, 'r') as f:
+        try:
+            json.load(f)
+        except json.JSONDecodeError:
+            raise ValueError(f"O arquivo de credenciais em {CREDENTIALS_PATH} não contém um JSON válido.")
+
+    # Carrega as credenciais
     credentials = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH)
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-except FileNotFoundError:
-    st.error(f"Erro: O arquivo de credenciais não foi encontrado em {CREDENTIALS_PATH}. Verifique o caminho.")
+except (FileNotFoundError, ValueError) as e:
+    st.error(f"Erro: {e}")
     st.stop()
 except Exception as e:
     st.error(f"Erro ao configurar as credenciais: {e}")
@@ -60,12 +75,12 @@ selected_model = st.sidebar.selectbox(
 )
 
 # Breve descrição do modelo selecionado
-if selected_model == "LSTM":
-    st.sidebar.info("**LSTM (Long Short-Term Memory)** é uma rede neural recorrente projetada para lidar com sequências temporais complexas e aprender padrões de longo prazo.")
-elif selected_model == "GRU":
-    st.sidebar.info("**GRU (Gated Recurrent Unit)** é uma variação simplificada da LSTM que reduz a complexidade computacional, mantendo desempenho similar para dados sequenciais.")
-elif selected_model == "SVR":
-    st.sidebar.info("**SVR (Support Vector Regression)** é um método de aprendizado de máquina baseado em suporte vetorial, usado para encontrar relações precisas em dados.")
+model_descriptions = {
+    "LSTM": "**LSTM (Long Short-Term Memory)** é uma rede neural recorrente projetada para lidar com sequências temporais complexas e aprender padrões de longo prazo.",
+    "GRU": "**GRU (Gated Recurrent Unit)** é uma variação simplificada da LSTM que reduz a complexidade computacional, mantendo desempenho similar para dados sequenciais.",
+    "SVR": "**SVR (Support Vector Regression)** é um método de aprendizado de máquina baseado em suporte vetorial, usado para encontrar relações precisas em dados."
+}
+st.sidebar.info(model_descriptions.get(selected_model, ""))
 
 # Mensagem ao usuário sobre a seleção
 st.write(f"Gerando gráficos para o SpotId: **{selected_item}** usando o modelo: **{selected_model}**")
@@ -129,9 +144,9 @@ if not df_main.empty and not df_model.empty:
             yaxis_title=col.capitalize(),
             hovermode="x unified",
         )
-        st.plotly_chart(fig, use_container_width=True)
-else:
-    st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
+       
+::contentReference[oaicite:0]{index=0}
+ 
 
 
 
