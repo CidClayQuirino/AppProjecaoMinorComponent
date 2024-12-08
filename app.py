@@ -9,9 +9,12 @@ import db_dtypes  # Verificar se o db-dtypes está instalado
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
-# Configuração do BigQuery
-CREDENTIALS_PATH = r"D:\Revisão Final TCC USP\credentials.json"
-credentials = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH)
+import os
+import json
+from google.oauth2 import service_account
+
+credentials_info = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 # Tabelas e colunas relevantes
