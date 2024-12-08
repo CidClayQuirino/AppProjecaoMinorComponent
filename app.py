@@ -10,7 +10,7 @@ import json
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
 # Caminho para o arquivo de credenciais
-CREDENTIALS_PATH = r"D:\Revisão Final TCC USP\credentials.json"
+CREDENTIALS_PATH = r"D:\credentials.json"
 
 # Carregar credenciais do arquivo local
 try:
