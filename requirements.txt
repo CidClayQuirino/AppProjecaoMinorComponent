@@ -1,5 +1,6 @@
 streamlit
 google-cloud-bigquery
-pandas
-plotly
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
 db-dtypes
