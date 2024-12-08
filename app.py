@@ -144,9 +144,6 @@ if not df_main.empty and not df_model.empty:
             yaxis_title=col.capitalize(),
             hovermode="x unified",
         )
-       
-::contentReference[oaicite:0]{index=0}
- 
-
-
-
+        st.plotly_chart(fig, use_container_width=True)
+else:
+    st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
