@@ -1,18 +1,16 @@
 #app.py
+# app.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from google.cloud import bigquery
 from google.oauth2 import service_account
-import db_dtypes  # Verificar se o db-dtypes está instalado
+import db_dtypes  # Certifique-se de que o db-dtypes está instalado
+import os
+import json
 
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
-
-import os
-import json
-from google.oauth2 import service_account
-from google.cloud import bigquery
 
 # Carregar credenciais do secrets no Streamlit Cloud
 try:
@@ -20,11 +18,11 @@ try:
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 except KeyError:
-    raise KeyError("A variável GOOGLE_APPLICATION_CREDENTIALS não foi configurada corretamente nos secrets.")
+    st.error("A variável GOOGLE_APPLICATION_CREDENTIALS não foi configurada corretamente nos secrets.")
+    st.stop()
 except json.JSONDecodeError:
-    raise ValueError("O conteúdo da variável GOOGLE_APPLICATION_CREDENTIALS não é um JSON válido.")
-
-
+    st.error("O conteúdo da variável GOOGLE_APPLICATION_CREDENTIALS não é um JSON válido.")
+    st.stop()
 
 # Tabelas e colunas relevantes
 project_id = credentials.project_id
@@ -63,17 +61,17 @@ selected_model = st.sidebar.selectbox(
 )
 
 # Breve descrição do modelo selecionado
-if selected_model == "LSTM":
-    st.sidebar.info("**LSTM (Long Short-Term Memory)** é uma rede neural recorrente projetada para lidar com sequências temporais complexas e aprender padrões de longo prazo.")
-elif selected_model == "GRU":
-    st.sidebar.info("**GRU (Gated Recurrent Unit)** é uma variação simplificada da LSTM que reduz a complexidade computacional, mantendo desempenho similar para dados sequenciais.")
-elif selected_model == "SVR":
-    st.sidebar.info("**SVR (Support Vector Regression)** é um método de aprendizado de máquina baseado em suporte vetorial, usado para encontrar relações precisas em dados.")
+model_descriptions = {
+    "LSTM": "**LSTM (Long Short-Term Memory)** é uma rede neural recorrente projetada para lidar com sequências temporais complexas e aprender padrões de longo prazo.",
+    "GRU": "**GRU (Gated Recurrent Unit)** é uma variação simplificada da LSTM que reduz a complexidade computacional, mantendo desempenho similar para dados sequenciais.",
+    "SVR": "**SVR (Support Vector Regression)** é um método de aprendizado de máquina baseado em suporte vetorial, usado para encontrar relações precisas em dados."
+}
+st.sidebar.info(model_descriptions[selected_model])
 
 # Mensagem ao usuário sobre a seleção
 st.write(f"Gerando gráficos para o SpotId: **{selected_item}** usando o modelo: **{selected_model}**")
 
-# Consultas ao BigQuery
+# Função para carregar dados
 @st.cache_data
 def carregar_dados(query):
     """Executa uma consulta no BigQuery e retorna um DataFrame."""
