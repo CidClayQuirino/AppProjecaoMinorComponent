@@ -4,23 +4,20 @@ import plotly.express as px
 from google.oauth2 import service_account
 from google.cloud import bigquery
 import base64
-
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
 
-# Função para adicionar imagem como plano de fundo
-def set_background(image_path):
+# Função para adicionar imagem como plano de fundo usando URL
+def set_background(image_url):
     """
     Adiciona uma imagem como plano de fundo no app Streamlit.
-    :param image_path: Caminho para a imagem de fundo.
+    :param image_url: URL da imagem de fundo.
     """
-    with open(image_path, "rb") as image_file:
-        encoded_image = base64.b64encode(image_file.read()).decode()
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background-image: url("data:image/png;base64,{encoded_image}");
+            background-image: url("{image_url}");
             background-size: cover;
             background-attachment: fixed;
         }}
