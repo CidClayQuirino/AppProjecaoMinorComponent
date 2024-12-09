@@ -3,9 +3,34 @@ import pandas as pd
 import plotly.express as px
 from google.oauth2 import service_account
 from google.cloud import bigquery
+import base64
 
 # Configuração do Streamlit
 st.set_page_config(page_title="Projeções de Modelos por SpotId", layout="wide")
+
+# Função para adicionar imagem como plano de fundo
+def set_background(image_path):
+    """
+    Adiciona uma imagem como plano de fundo no app Streamlit.
+    :param image_path: Caminho para a imagem de fundo.
+    """
+    with open(image_path, "rb") as image_file:
+        encoded_image = base64.b64encode(image_file.read()).decode()
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{encoded_image}");
+            background-size: cover;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Configuração de fundo com URL da imagem
+set_background("https://raw.githubusercontent.com/CidClayQuirino/AppProjecaoMinorComponent/main/395%2001.jpg")
 
 # Credenciais diretamente no código
 credentials_dict = {
@@ -165,3 +190,4 @@ if not df_main.empty and not df_model.empty:
         st.plotly_chart(fig, use_container_width=True)
 else:
     st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
+
