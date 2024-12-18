@@ -59,7 +59,7 @@ spot_ids = [
 
 # Sidebar para seleção
 st.sidebar.title("Configurações")
-selected_item = st.sidebar.selectbox("Selecione o SpotId:", options=spot_ids)
+selected_item = st.sidebar.selectbox("Selecione o COMPONENTE:", options=spot_ids)
 selected_model = st.sidebar.selectbox(
     "Selecione o modelo de projeção:", options=["GRU", "LSTM", "SVR"]
 )
