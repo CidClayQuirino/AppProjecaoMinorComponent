@@ -4,9 +4,6 @@ google-auth
 google-auth-oauthlib
 google-auth-httplib2
 db-dtypes
-pymc3
-arviz
-pymc
 numpy
 matplotlib
 scipy
