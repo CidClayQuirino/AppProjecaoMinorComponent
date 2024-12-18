@@ -170,7 +170,7 @@ if not df_main.empty and not df_model.empty:
 
         # Renderizar o gráfico no Streamlit
         st.plotly_chart(fig, use_container_width=True)
-        st.set_page_config(page_title="Minha Aplicação", layout="wide")
+        #st.set_page_config(page_title="Minha Aplicação", layout="wide")
 
 else:
     st.warning("Os dados históricos ou de projeção não foram encontrados para o SpotId ou modelo selecionado.")
