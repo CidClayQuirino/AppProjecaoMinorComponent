@@ -73,7 +73,7 @@ model_descriptions = {
 st.sidebar.info(model_descriptions.get(selected_model, ""))
 
 # Mensagem ao usuário sobre a seleção
-st.write(f"Gerando gráficos para o COMPONENTE: **{selected_item}** usando o modelo: **{selected_model}**")
+#st.write(f"Gerando gráficos para o COMPONENTE: **{selected_item}** usando o modelo: **{selected_model}**")
 
 # Consultas ao BigQuery
 @st.cache_data
