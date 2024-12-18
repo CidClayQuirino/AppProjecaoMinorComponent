@@ -35,6 +35,8 @@ model_tables = {
     "SVR": f"{project_id}.{dataset_id}.df_dynapredict_svr_results",
 }
 parameters = ['temperature', 'accelerationx', 'accelerationy', 'accelerationz', 'velocityx', 'velocityy', 'velocityz']
+os.system("streamlit run app.py --server.configFile=config.toml")
+
 
 # Lista de SpotIds disponíveis
 spot_ids = [
