@@ -19,7 +19,7 @@ try:
         credentials_dict = json.load(file)
     credentials = service_account.Credentials.from_service_account_info(credentials_dict)
     client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-    st.success("")
+    #st.success("")
 except FileNotFoundError:
     st.error(f"Arquivo de credenciais não encontrado no caminho: {credentials_path}")
     st.stop()
